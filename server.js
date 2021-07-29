@@ -10,6 +10,11 @@ let app = express()
 //creiamo la variabile db
 let db
 
+// process.env.PORT fa in modo che se c'è una porta da usare per le chiamate la trova e la utilizza
+let port = process.env.PORT
+if(port == null || port == ""){
+  port = 3000
+}
 app.use(express.static('public'))
 
 //una volta installato con npm ed agganciato il pacchetto mongoDB al nostro server.js per creare un collegamento al database usiamo la seguente funzione
@@ -19,7 +24,10 @@ mongodb.connect(connectionString, {useNewUrlParser: true, useUnifiedTopology: tr
   // ovviamente la variabile db che useremo spesso per tutto quello che ci serve, non viene popolata fino a quando non c'è una connessione al database ( mongodb.connect( etc etc) quindi se non c'è 
   db = client.db()
   // inseriamo app.listener(3000) all'interno della funzione che si connette al db per fare in modo che l'app funzioni e ci mostri la pagina solo dopo che si è connessa al db
-  app.listen(3000)
+  // la variabile port cambia a seconda se l'app è in locale o deployata
+  app.listen(port)
+  
+  
 })
 
 app.use(express.json())
@@ -31,7 +39,6 @@ app.use(express.urlencoded({extended: false}))
 // proteggiamo il sito con username e password
 function passwordProtected(req, res, next){
   res.set('WWW-authenticate', 'Basic realm="Simple Todo App"')
-  console.log(req.headers.authorization)
 
   //questo if ci serve per controllare se l'autenticazione è corretta.
   if(req.headers.authorization == "Basic bGVhcm46amF2YXNjcmlwdA=="){
